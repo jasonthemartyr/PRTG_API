@@ -17,7 +17,6 @@ class PRTG(object):
         Combines base URL with URI
         :param uri:
         :return:
-        lkj
         """
         urls = self.url + '{}'
         request = urls.format(uri)
