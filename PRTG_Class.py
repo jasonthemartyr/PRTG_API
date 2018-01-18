@@ -45,7 +45,7 @@ class PRTG(object):
 
 
 username = 'jmarter'
-password = 'November19!'
+password = 'PASSWORD'
 id = '5133'
 message = "'API testing will resume monitoring shortly'"
 base_url = 'https://192.168.239.60/'
