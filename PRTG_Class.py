@@ -42,13 +42,3 @@ class PRTG(object):
         request =requests.post(url, params={'username': self.username,'password': self.password,'id': self.id, 'action': '1'}, verify=False)
         return request
 
-
-
-username = 'jmarter'
-password = 'PASSWORD'
-id = '5133'
-message = "'API testing will resume monitoring shortly'"
-base_url = 'https://192.168.239.60/'
-test_params = {'username': username,'password': password,'id': id,  'pausemsg': message}
-site = PRTG(base_url,**test_params)
-print(site.resume_node())
