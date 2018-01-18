@@ -9,24 +9,30 @@ def modifyURL(base_url, uri):
 
 username = 'jmarter'
 password = 'PASSWORD'
-id = 'SITE ID'
+id = '23060'
 message = "'API testing will resume monitoring shortly'"
 
-base_url = 'URL'
+base_url = 'http://prtg.wernerds.net/'
 login_uri = 'table.xml?content=sensors&columns=sensor&'
-
 pause_uri = 'api/pause.htm?'
+all_sensors_uri = 'api/table.xml?'
 
-# login_params = {'username': username,'password': password}
-# pause_params = {'id': id, 'pausemsg': message, 'action': '0'}
+
+#login_params = {'username': username,'password': password}
+#pause_params = {'id': id, 'pausemsg': message, 'action': '0'}
 
 #switch 'action' to '1' to resume. The 'pausemsg' will need to be removed
-test_params = {'username': username,'password': password,'id': id, 'pausemsg': message, 'action': '0'}
+test_params = {'username': username,'password': password,'id': id,  'pausemsg': message,'action': '1'}
 
 
-r2 = requests.put(modifyURL(base_url, pause_uri),params=test_params)
+
+
+r2 = requests.post(modifyURL(base_url, pause_uri),params=test_params)
+#
 
 print(r2.status_code, r2.reason)
-
+#
+r3 = requests.get('http://prtg.wernerds.net//api/table.xml?content=sensors&columns=objid,group,device,sensor,status,message,lastvalue,priority,favorite')
+print(r3.status_code, r3.reason, r3.text)
 
 
