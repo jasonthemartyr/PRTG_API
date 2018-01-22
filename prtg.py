@@ -1,15 +1,36 @@
 from PRTG_Class import PRTG
 
-username = 'jmarter'
-password = 'PASSWORD'
-id = '5133'
-message = "'API testing will resume monitoring shortly'"
-base_url = 'https://192.168.239.60/'
-test_params = {'username': username,'password': password,'id': id,  'pausemsg': message}
-site = PRTG(base_url,**test_params)
 
-print(site.get_ids())
-print(help(site))
+
+def main():
+    username = 'jmarter'
+    password = 'PASSWORD'
+    id = '5133'
+    message = "'API testing will resume monitoring shortly'"
+    base_url = 'https://192.168.239.60/'
+    clone_id = '1234'
+    new_id = '1231'
+    new_group_name =' test group'
+    new_device_name = 'test device'
+    new_sensor_name = 'test sensor'
+
+    test_params = {'username': username,
+                   'password': password,
+                   'id': id,
+                   'pausemsg': message,
+                   'clone_id': clone_id,
+                   'new_id': new_id,
+                   'name': new_group_name}
+
+
+    site = PRTG(base_url,**test_params)
+
+    print(site.get_device_ids())
+
+
+
+if __name__ == "__main__":
+    main()
 
 
 # import requests
