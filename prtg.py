@@ -8,8 +8,7 @@ base_url = 'https://192.168.239.60/'
 test_params = {'username': username,'password': password,'id': id,  'pausemsg': message}
 site = PRTG(base_url,**test_params)
 
-print(site.resume_node())
-
+print(site.get_id())
 
 
 
