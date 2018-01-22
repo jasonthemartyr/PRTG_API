@@ -1,7 +1,4 @@
 import requests
-
-from xml.dom import minidom
-from xml.dom.minidom import parse
 from xml.etree import ElementTree
 
 class PRTG(object):
@@ -27,7 +24,7 @@ class PRTG(object):
         request = urls.format(uri)
         return request
 
-    def get_id(self):
+    def get_ids(self):
         """
         GET request to filter XML response and return ID : DEVCE NAME in a dictionary
         :return:
@@ -46,14 +43,11 @@ class PRTG(object):
             elem_str = str(elem)
             elem_name = name_output.append(elem.text) if 'name' in elem_str else False
             elem_id = id_output.append(elem.text) if 'id' in elem_str else False
-
         id_name_dict = zip(id_output, name_output)
         for key, value in id_name_dict:
             if '[Cisco Device]' in value:
                 output_dict[key] = value
         return output_dict
-
-
 
     def pause_node(self):
         """

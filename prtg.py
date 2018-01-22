@@ -8,8 +8,8 @@ base_url = 'https://192.168.239.60/'
 test_params = {'username': username,'password': password,'id': id,  'pausemsg': message}
 site = PRTG(base_url,**test_params)
 
-print(site.get_id())
-
+print(site.get_ids())
+print(help(site))
 
 
 # import requests
