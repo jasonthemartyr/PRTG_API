@@ -1,18 +1,21 @@
 from PRTG_Class import PRTG
 
 
-
 def main():
     username = 'jmarter'
     password = 'PASSWORD'
     id = '5133'
     message = "'API testing will resume monitoring shortly'"
-    base_url = 'https://192.168.239.60/'
-    clone_id = '1234'
-    new_id = '1231'
+    base_url = 'https://prtg-monitor.wernerds.net/'
+    #clone_id = '14731'
+    clone_id = '14756' #DeviceJoliet-IL-109.2
+    new_id = '14871' #group ID of test group
     new_group_name =' test group'
-    new_device_name = 'test device'
-    new_sensor_name = 'test sensor'
+
+
+
+    group_name = 'test'
+
 
     test_params = {'username': username,
                    'password': password,
@@ -25,7 +28,11 @@ def main():
 
     site = PRTG(base_url,**test_params)
 
+    #print(site.get_device_ids())
+    #print(site.duplicate_group_or_sensor())
     print(site.get_device_ids())
+    #print(site.resume_node('15122'))
+
 
 
 
