@@ -1,2 +1,2 @@
 # PRTG_API
-Using the Requests module to modify objects on PRTG via REST
+Using the Requests module to modify objects in PRTG via REST
