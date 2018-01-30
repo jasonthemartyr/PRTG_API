@@ -15,10 +15,10 @@ class PRTG(object):
         self.password = payload.get('password') if 'password' in payload else False
         self.id = payload.get('id') if 'id' in payload else False
         self.pausemsg = payload.get('pausemsg') if 'pausemsg' in payload else False
-
         self.cloneid = payload.get('clone_id') if 'clone_id' in payload else False
         self.newid = payload.get('new_id') if 'new_id' in payload else False
         self.name = payload.get('name') if 'name' in payload else False
+
 
     def combine_url(self, uri):
         """
@@ -50,6 +50,7 @@ class PRTG(object):
             elem_str = str(elem)
             elem_name = name_output.append(elem.text) if 'name' in elem_str else False
             elem_id = id_output.append(elem.text) if 'id' in elem_str else False
+
         id_name_dict = zip(id_output, name_output)
 
         for key, value in id_name_dict:
@@ -59,41 +60,51 @@ class PRTG(object):
 
     #need 'get_group_id' method
 
-    def pause_node(self):
+    def pause_node(self, node_id):
         """
-        POST request to pause monitoring for a node
+        POST request ro pause monitoring for a node ID specified by user
+        :param node_id:
         :return:
         """
         url = self.combine_url(self.pause)
         print('Pausing {}.....'.format(self.id))
-        return requests.post(url, params={'username': self.username,'password': self.password,'id': self.id,  'pausemsg': self.pausemsg,'action': '0'}, verify=False)
+        return requests.post(url, params={'username': self.username,'password': self.password,'id': node_id,  'pausemsg': self.pausemsg,'action': '0'}, verify=False)
 
-    def resume_node(self):
+    def resume_node(self, node_id):
         """
-        POST request to resume monitoring for a node
+        POST request to resume monitoring for a node ID specified by user
+        :param node_id:
         :return:
         """
         url = self.combine_url(self.pause)
         print('Resuming {}.....'.format(self.id))
-        return requests.post(url, params={'username': self.username,'password': self.password,'id': self.id, 'action': '1'}, verify=False)
+        return requests.post(url, params={'username': self.username,'password': self.password,'id': node_id, 'action': '1'}, verify=False)
         #return request
 
-    def delete_node(self):
+    def delete_node(self, node_id):
         """
-        DELETE request to remove a node
+        DELETE request to delete node ID specified by user
+        :param node_id:
         :return:
         """
+
         url = self.combine_url(self.delete)
         print('Deleting {}.....'.format(self.id))
         return requests.delete(url, params={'username': self.username,'password': self.password,'id': self.id, 'approve': '1'}, verify=False)
 
+
+    #last two methods need variable cleanup
+
     def duplicate_group_or_sensor(self):
         """
-        POST request to duplicate a group object ID with a new name/ID
+        POST request to duplicate a group or sensor object ID with a new name/ID
         :return:
         """
         url = self.combine_url(self.duplicateobject)
+        print(url)
         print('Cloning Group or Sensor: {} and renaming {} with new ID of {}'.format(self.cloneid, self.name, self.newid))
+        print("Group monitoring is paused. Please resume via the GUI or with 'site.resume_node'")
+
         return requests.post(url, params={'username': self.username,'password': self.password,'id': self.cloneid, 'name':self.name, 'targetid':self.newid}, verify=False)
 
 
@@ -104,11 +115,11 @@ class PRTG(object):
         """
         url = self.combine_url(self.duplicateobject)
 
-        #/api/duplicateobject.htm?id=id_of_device_to_clone&name=new_name&host=new_hostname_or_ip&targetid=id_of_target_group
 
         print('Cloning Device: {} and renaming {} with new ID of {}'.format(self.cloneid, self.name, self.newid))
 
-        #payload needs new parameter for 'hostname'
-        #return requests.post(url, params={'username': self.username,'password': self.password,'id': self.cloneid, 'name':self.name, 'targetid':self.newid}, verify=False)
+        return requests.post(url, params={'username': self.username,'password': self.password,'id': self.cloneid, 'name':self.name,'host':self.name, 'targetid':self.newid}, verify=False)
+
+
 
 
