@@ -1,10 +1,11 @@
 # PRTG_API
 
-A simple python class that user the Requests module to get device ID's, pause, resume, delete
+A simple python class that uses the Requests module to get device ID's, pause, resume, delete
 
 ## Getting Started
 
 These instructions will get you a copy of the project up and running on your local machine for development and testing purposes.
+
 ### Prerequisites
 
 Python 3.6+ is required
