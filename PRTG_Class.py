@@ -1,26 +1,23 @@
 import requests
 from xml.etree import ElementTree
+import urllib3
+
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+
 
 class PRTG(object):
-
     def __init__(self, url, **kwargs):
-        payload = kwargs
+        auth_payload = kwargs
         self.url = url
-        self.sensortree = 'api/table.xml?content=sensortree'
-        self.pause ='api/pause.htm?'
-        self.delete = 'api/deleteobject.htm?'
-        self.duplicateobject = 'api/duplicateobject.htm?'
+        self.sensortree = '/api/table.xml?content=sensortree'
+        self.pause = '/api/pause.htm?'
+        self.delete = '/api/deleteobject.htm?'
+        self.duplicateobject = '/api/duplicateobject.htm?'
 
-        self.username = payload.get('username') if 'username' in payload else False
-        self.password = payload.get('password') if 'password' in payload else False
-        self.id = payload.get('id') if 'id' in payload else False
-        self.pausemsg = payload.get('pausemsg') if 'pausemsg' in payload else False
-        self.cloneid = payload.get('clone_id') if 'clone_id' in payload else False
-        self.newid = payload.get('new_id') if 'new_id' in payload else False
-        self.name = payload.get('name') if 'name' in payload else False
+        self.username = auth_payload.get('username') if 'username' in auth_payload else False
+        self.password = auth_payload.get('password') if 'password' in auth_payload else False
 
-
-    def combine_url(self, uri):
+    def __combine_url(self, uri):
         """
         Combines base URL with URI
         :param uri:
@@ -30,17 +27,17 @@ class PRTG(object):
         request = urls.format(uri)
         return request
 
-    def get_device_ids(self):
+    def __get_device_ids(self, device_name):
         """
         GET request to filter XML response and return ID : DEVICE NAME in a dictionary
         :return:
         """
 
-        url = self.combine_url(self.sensortree)
-        print(url)
-        r = requests.get(url, params={'username': self.username,'password': self.password}, verify=False, stream=True)
+        url = self.__combine_url(self.sensortree)
+        # print(url)
+        r = requests.get(url, params={'username': self.username, 'password': self.password}, verify=False, stream=True)
         r.raw.decode_content = True
-        print(r)
+        # print(r)
         events = ElementTree.iterparse(r.raw)
         name_output = []
         id_output = []
@@ -54,11 +51,11 @@ class PRTG(object):
         id_name_dict = zip(id_output, name_output)
 
         for key, value in id_name_dict:
-            if '[Cisco Device]' in value:
+            if device_name in value:
                 output_dict[key] = value
         return output_dict
 
-    #need 'get_group_id' method
+    # need 'get_group_id' method
 
     def pause_node(self, node_id):
         """
@@ -66,9 +63,11 @@ class PRTG(object):
         :param node_id:
         :return:
         """
-        url = self.combine_url(self.pause)
-        print('Pausing {}.....'.format(self.id))
-        return requests.post(url, params={'username': self.username,'password': self.password,'id': node_id,  'pausemsg': self.pausemsg,'action': '0'}, verify=False)
+        url = self.__combine_url(self.pause)
+        pause_msg = 'Pausing {}.....'.format(node_id)
+        print(pause_msg)
+        return requests.post(url, params={'username': self.username, 'password': self.password, 'id': node_id,
+                                          'pausemsg': pause_msg, 'action': '0'}, verify=False)
 
     def resume_node(self, node_id):
         """
@@ -76,10 +75,10 @@ class PRTG(object):
         :param node_id:
         :return:
         """
-        url = self.combine_url(self.pause)
-        print('Resuming {}.....'.format(self.id))
-        return requests.post(url, params={'username': self.username,'password': self.password,'id': node_id, 'action': '1'}, verify=False)
-        #return request
+        url = self.__combine_url(self.pause)
+        return requests.post(url, params={'username': self.username, 'password': self.password, 'id': node_id,
+                                          'action': '1'}, verify=False)
+        # return request
 
     def delete_node(self, node_id):
         """
@@ -88,38 +87,43 @@ class PRTG(object):
         :return:
         """
 
-        url = self.combine_url(self.delete)
-        print('Deleting {}.....'.format(self.id))
-        return requests.delete(url, params={'username': self.username,'password': self.password,'id': self.id, 'approve': '1'}, verify=False)
+        url = self.__combine_url(self.delete)
+        print('Deleting {}.....'.format(node_id))
+        return requests.delete(url, params={'username': self.username, 'password': self.password, 'id': node_id,
+                                            'approve': '1'}, verify=False)
 
-
-    #last two methods need variable cleanup
-
-    def duplicate_group_or_sensor(self):
+    def duplicate_object(self, **kwargs):
         """
-        POST request to duplicate a group or sensor object ID with a new name/ID
+
+        :param kwargs:
         :return:
         """
-        url = self.combine_url(self.duplicateobject)
-        print(url)
-        print('Cloning Group or Sensor: {} and renaming {} with new ID of {}'.format(self.cloneid, self.name, self.newid))
-        print("Group monitoring is paused. Please resume via the GUI or with 'site.resume_node'")
 
-        return requests.post(url, params={'username': self.username,'password': self.password,'id': self.cloneid, 'name':self.name, 'targetid':self.newid}, verify=False)
+        parameters_payload = kwargs
+        url = self.__combine_url(self.duplicateobject)
 
+        id_of_device_to_clone = parameters_payload.get(
+            'id_of_device_to_clone') if 'id_of_device_to_clone' in parameters_payload else False
+        new_name = parameters_payload.get('new_name') if 'new_name' in parameters_payload else False
+        new_hostname_or_ip = parameters_payload.get(
+            'new_hostname_or_ip') if 'new_hostname_or_ip' in parameters_payload else False
+        id_of_target_group = parameters_payload.get(
+            'id_of_target_group') if 'id_of_target_group' in parameters_payload else False
 
-    def duplicate_device(self):
-        """
-        POST request to duplicate a device object ID with a new name/ID
-        :return:
-        """
-        url = self.combine_url(self.duplicateobject)
+        if 'device' in parameters_payload.get('object_type'):
+            requests.post(url, params={'username': self.username, 'password': self.password,
+                                       'id': id_of_device_to_clone, 'name': new_name,
+                                       'host': new_hostname_or_ip, 'targetid': id_of_target_group}, verify=False)
+            node_id = self.__get_device_ids(new_name)
+            self.resume_node(node_id)
 
+            return 'Cloned device {} to Group {} as {}'.format(id_of_device_to_clone, id_of_target_group, new_name)
 
-        print('Cloning Device: {} and renaming {} with new ID of {}'.format(self.cloneid, self.name, self.newid))
+        elif 'group' in parameters_payload.get('object_type') or 'sensor' in parameters_payload.get('object_type'):
+            requests.post(url, params={'username': self.username, 'password': self.password,
+                                       'id': id_of_device_to_clone, 'name': new_name,
+                                       'targetid': id_of_target_group}, verify=False)
+            return 'Cloned group {} as {}'.format(id_of_device_to_clone, id_of_target_group)
 
-        return requests.post(url, params={'username': self.username,'password': self.password,'id': self.cloneid, 'name':self.name,'host':self.name, 'targetid':self.newid}, verify=False)
-
-
-
-
+            # group_id = self.__get_device_ids(new_name)  # need get group ID method
+            # return self.resume_node(group_id)
