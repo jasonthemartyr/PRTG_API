@@ -94,7 +94,7 @@ class PRTG(object):
 
     def duplicate_object(self, **kwargs):
         """
-
+        POST request to duplicate a device, group, or sensor
         :param kwargs:
         :return:
         """
