@@ -13,6 +13,8 @@ class PRTG(object):
         self.pause = '/api/pause.htm?'
         self.delete = '/api/deleteobject.htm?'
         self.duplicateobject = '/api/duplicateobject.htm?'
+        self.devices = '/api/table.xml?content=devices&output=csvtable&columns=device,host'
+
 
         self.username = auth_payload.get('username') if 'username' in auth_payload else False
         self.password = auth_payload.get('password') if 'password' in auth_payload else False
@@ -55,11 +57,27 @@ class PRTG(object):
                 output_dict[key] = value
         return output_dict
 
+    def get_devices(self):
+        """
+        GET request to return a list of devices in PRTG
+        :return:
+        """
+
+        output = []
+        url = self.__combine_url(self.devices)
+        #print(url)
+        devices = requests.get(url, params={'username': self.username, 'password': self.password}, verify=False)
+        devices.raw.decode_content = True
+        device_list = devices.text
+        for device in device_list.split():
+            output.append(device)
+        return output
+
     # need 'get_group_id' method
 
     def pause_node(self, node_id):
         """
-        POST request ro pause monitoring for a node ID specified by user
+        POST request to pause monitoring for a node ID specified by user
         :param node_id:
         :return:
         """
